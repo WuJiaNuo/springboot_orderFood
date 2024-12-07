@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysPostMapper">
+    <resultMap id="sysPostMap" type="edu.gdbtu.lzq.system.model.SysPost" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.post_code
+            ,x1.name
+            ,x1.description
+            ,x1.status,sysDicItem.name as statusName
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+            ,x1.id
+
+    </sql>
+    <sql id="middles">
+        from sys_post x1
+                left join (select * from sys_dic_item where is_deleted=0) sysDicItem  on x1.status=sysDicItem.code
+    </sql>
+    <sql id="conditions">
+                <if test="vo.postCode != null and vo.postCode != ''">
+              and x1.post_code like CONCAT('%',#{vo.postCode},'%')
+                </if>
+                <if test="vo.name != null and vo.name != ''">
+              and x1.name like CONCAT('%',#{vo.name},'%')
+                </if>
+                <if test="vo.description != null and vo.description != ''">
+              and x1.description like CONCAT('%',#{vo.description},'%')
+                </if>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+              and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+             and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+             and x1.is_deleted = 0 order by x1.create_time desc
+    </sql>
+    <select id="selectPage" resultMap="sysPostMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+    <select id="queryList" resultMap="sysPostMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+</mapper>

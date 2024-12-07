@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysUserMapper">
+
+    <resultMap id="SysUserMap" type="edu.gdbtu.lzq.model.system.SysUser" autoMapping="true">
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+      u.id,u.username,u.password,u.name,u.phone,head_url,u.post_id,u.dept_id,u.description,
+      u.status,u.create_time,u.update_time,u.is_deleted,d.dept_name
+   </sql>
+    <select id="selectPage" resultMap="SysUserMap">
+        select
+        <include refid="columns"/>
+        from sys_user u left join (select group_concat(sd.name order by sd.level asc) as dept_name,
+        sud.user_id from sys_dept sd
+        inner join sys_user_dept sud on sd.id=sud.dept_id
+        where sd.is_deleted = 0 and sud.is_deleted=0
+        group by sud.user_id) d on u.id = d.user_id
+        <where>
+            <if test="vo.keyword != null and vo.keyword != ''">
+                and (u.username like CONCAT('%',#{vo.keyword},'%') or u.name like CONCAT('%',#{vo.keyword},'%') or
+                u.phone like CONCAT('%',#{vo.keyword},'%'))
+            </if>
+            <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                and u.create_time >= #{vo.createTimeBegin}
+            </if>
+            <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                and u.create_time &lt;= #{vo.createTimeEnd}
+            </if>
+            <if test="vo.examId != null and vo.examId != ''">
+                and exists (select 1 from user_exam_relation tur where
+                tur.is_deleted=0
+                and tur.user_id=u.id and tur.exam_id=#{vo.examId})
+            </if>
+            <choose>
+                <when test="vo.deptId!= null and vo.deptId!=''">
+                    and  exists (select 1 from sys_user_dept xs inner join sys_dept xd
+                    on xs.dept_id=xd.id where u.id=xs.user_id
+                    and xs.is_deleted=0 and xd.is_deleted=0 and xd.tree_path
+                    like CONCAT('%,',#{vo.deptId},',%'))
+                </when>
+                <when test="vo.curDeptIds!= null">
+                    and  exists (select 1 from sys_user_dept xs inner join sys_dept xd
+                    on xs.dept_id=xd.id where u.id=xs.user_id
+                    and xs.is_deleted=0 and xd.is_deleted=0 and
+                    <foreach item="item" index="index" collection="vo.curDeptIds" open="(" separator=" or" close="))">
+                        xd.tree_path like CONCAT('%,',#{item},',%')
+                    </foreach>
+                </when>
+            </choose>
+            and u.is_deleted = 0
+        </where>
+        order by u.create_time desc
+    </select>
+
+
+</mapper>

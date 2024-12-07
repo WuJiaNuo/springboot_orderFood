@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysDeptMapper">
+    <select id="findList" resultType="java.util.Map">
+        select
+        id,name,parent_id,name as label
+        from sys_dept
+        <where>
+            <choose>
+                <when test="vo.deptId!= null and vo.deptId!=''">
+                    and tree_path like CONCAT('%,',#{vo.deptId},',%')
+                </when>
+                <when test="vo.curDeptIds!= null">
+                    <foreach item="item" index="index" collection="vo.curDeptIds" open="and (" separator=" or" close=")">
+                        tree_path like CONCAT('%,',#{item},',%')
+                    </foreach>
+                </when>
+            </choose>
+            and is_deleted=0 order by level asc
+        </where>
+    </select>
+    <select id="queryList" resultType="edu.gdbtu.lzq.model.system.SysDept">
+        select * from sys_dept
+        <where>
+        <choose>
+            <when test="vo.deptId!= null and vo.deptId!=''">
+                and tree_path like CONCAT('%,',#{vo.deptId},',%'))
+            </when>
+            <when test="vo.curDeptIds!= null">
+                <foreach item="item" index="index" collection="vo.curDeptIds" open="and (" separator=" or" close=")">
+                    tree_path like CONCAT('%,',#{item},',%')
+                </foreach>
+            </when>
+        </choose>
+            and is_deleted=0 order by level asc
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.mapper.ExamMapper">
+    <resultMap id="tbExamMap" type="edu.gdbtu.lzq.model.Exam" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        x1.title
+        ,x1.duration
+        ,x1.criteria
+        ,x1.remark
+        ,x1.dept_id,sysDept.name as deptName
+        ,x1.start_time
+        ,x1.end_time
+        ,x1.create_time
+        ,x1.update_time
+        ,x1.is_deleted
+        ,x1.id
+        ,x1.type
+        ,x1.get_type
+        ,x1.get_num
+        ,sysDicItem.name typeName
+        ,sysDicItem2.name getTypeName
+        <if test="vo.curUserId != null and vo.curUserId != ''">
+            <![CDATA[,case when x1.type='5001' then '8' when ter.exam_id is not null then '4' when sysdate()
+        < x1.start_time then
+        '1'  when SYSDATE() > x1.end_time then '2'
+             else '3' end examSta]]>
+        </if>
+    </sql>
+    <sql id="middles">
+        from exam x1
+        left join (select * from sys_dept where is_deleted=0) sysDept on x1.dept_id=sysDept.id
+        left join (select * from sys_dic_item where is_deleted=0) sysDicItem on x1.type=sysDicItem.code
+        left join (select * from sys_dic_item where is_deleted=0) sysDicItem2 on x1.get_type=sysDicItem2.code
+        <if test="vo.curUserId != null and vo.curUserId != ''">
+            left join (select exam_id,user_id from exam_result where  is_deleted=0 group by exam_id,user_id) ter
+                                                 on   ter.exam_id=x1.id and ter.user_id=#{vo.curUserId}
+        </if>
+    </sql>
+
+    <sql id="conditions">
+        <if test="vo.deptName != null and vo.deptName != ''">
+            and sysDept.name like CONCAT('%',#{vo.deptName},'%')
+        </if>
+        <if test="vo.title != null and vo.title != ''">
+            and x1.title like CONCAT('%',#{vo.title},'%')
+        </if>
+        <if test="vo.remark != null and vo.remark != ''">
+            and x1.remark like CONCAT('%',#{vo.remark},'%')
+        </if>
+        <if test="vo.questionId != null and vo.questionId != ''">
+            and exists (select 1 from exam_question_relation tbExamQuestionRelation where
+            tbExamQuestionRelation.is_deleted=0
+            and tbExamQuestionRelation.exam_id=x1.id and tbExamQuestionRelation.question_id=#{vo.questionId})
+        </if>
+        <if test="vo.curUserId != null and vo.curUserId != ''">
+            and exists (select 1 from user_exam_relation uer where uer.user_id=#{vo.curUserId} and uer.exam_id=x1.id
+            and uer.is_deleted=0)
+        </if>
+        <choose>
+            <when test="vo.deptId != null and vo.deptId != ''">
+                and exists (select 1 from sys_dept xd
+                where x1.dept_id=xd.id
+                and xd.is_deleted=0 and xd.tree_path
+                like CONCAT('%,',#{vo.deptId},',%'))
+            </when>
+            <when test="vo.curDeptIds!= null">
+                and exists (select 1 from sys_dept xd
+                where x1.dept_id=xd.id
+                and xd.is_deleted=0 and
+                <foreach item="item" index="index" collection="vo.curDeptIds" open="(" separator=" or" close="))">
+                    xd.tree_path like CONCAT('%,',#{item},',%')
+                </foreach>
+            </when>
+        </choose>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+            and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+            and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+        and x1.is_deleted = 0 order by x1.create_time desc
+    </sql>
+    <select id="selectPage" resultMap="tbExamMap">
+        select
+        <include refid="columns"/>
+        <include refid="middles"/>
+        <where>
+            <include refid="conditions"/>
+        </where>
+    </select>
+    <select id="queryList" resultMap="tbExamMap">
+        select
+        <include refid="columns"/>
+        <include refid="middles"/>
+        <where>
+            <include refid="conditions"/>
+        </where>
+    </select>
+    <select id="getById" resultMap="tbExamMap">
+        select x.*, d.name as dept_name
+        from exam x
+                 left join (select id, name from sys_dept where is_deleted = 0) d on x.dept_id = d.id
+        where x.id = #{id}
+    </select>
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysUserDeptMapper">
+    <resultMap id="sysUserDeptMap" type="edu.gdbtu.lzq.system.model.SysUserDept" autoMapping="true">
+
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.user_id
+            ,x1.dept_id
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+            ,x1.id
+    </sql>
+    <select id="selectPage" resultMap="sysUserDeptMap">
+        select <include refid="columns" />
+        from sys_user_dept x1
+        <where>
+                        <if test="vo.userId != null and vo.userId != ''">
+                                    and x1.user_id=#{vo.userId}
+                        </if>
+                        <if test="vo.deptId != null and vo.deptId != ''">
+                                    and x1.dept_id=#{vo.deptId}
+                        </if>
+                    <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                        and x1.create_time >= #{vo.createTimeBegin}
+                    </if>
+                    <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                        and x1.create_time &lt;= #{vo.createTimeEnd}
+                    </if>
+                    <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+                        and x1.create_time >= #{vo.updateTimeBegin}
+                    </if>
+                    <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+                        and x1.create_time &lt;= #{vo.updateTimeEnd}
+                    </if>
+                    and x1.is_deleted = 0
+        </where>
+        order by x1.create_time desc
+    </select>
+    <select id="queryList" resultMap="sysUserDeptMap">
+        select <include refid="columns" />
+        from sys_user_dept x1
+        <where>
+
+
+                    <if test="vo.userId != null and vo.userId != ''">
+                            and x1.user_id=#{vo.userId}
+                    </if>
+
+                    <if test="vo.deptId != null and vo.deptId != ''">
+                            and x1.dept_id=#{vo.deptId}
+                    </if>
+
+            <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                and x1.create_time >= #{vo.createTimeBegin}
+            </if>
+            <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                and x1.create_time &lt;= #{vo.createTimeEnd}
+            </if>
+            <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+                and x1.create_time >= #{vo.updateTimeBegin}
+            </if>
+            <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+                and x1.create_time &lt;= #{vo.updateTimeEnd}
+            </if>
+            and x1.is_deleted = 0
+        </where>
+    </select>
+</mapper>

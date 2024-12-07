@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysDicMapper">
+    <resultMap id="sysDicMap" type="edu.gdbtu.lzq.system.model.SysDic" autoMapping="true">
+
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            id
+            ,name
+            ,code
+            ,create_time
+            ,update_time
+            ,is_deleted
+    </sql>
+    <select id="selectPage" resultMap="sysDicMap">
+        select <include refid="columns" />
+        from sys_dic
+        <where>
+                    <if test="vo.name != null and vo.name != ''">
+                     and name like CONCAT('%',#{vo.name},'%')
+                    </if>
+                    <if test="vo.code != null and vo.code != ''">
+                     and code like CONCAT('%',#{vo.code},'%')
+                    </if>
+                    <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                        and create_time >= #{vo.createTimeBegin}
+                    </if>
+                    <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                        and create_time &lt;= #{vo.createTimeEnd}
+                    </if>
+                    <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+                        and create_time >= #{vo.updateTimeBegin}
+                    </if>
+                    <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+                        and create_time &lt;= #{vo.updateTimeEnd}
+                    </if>
+                    and is_deleted = 0
+        </where>
+        order by create_time desc
+    </select>
+</mapper>

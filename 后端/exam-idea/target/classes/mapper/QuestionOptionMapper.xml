@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.mapper.QuestionOptionMapper">
+    <resultMap id="tbQuestionOptionMap" type="edu.gdbtu.lzq.model.QuestionOption" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.question_id
+            ,x1.options
+            ,x1.name
+            ,x1.is_right
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+
+    </sql>
+    <sql id="middles">
+        from question_option x1
+    </sql>
+    <sql id="conditions">
+                <if test="vo.questionId != null and vo.questionId != ''">
+              and x1.question_id=#{vo.questionId}
+                </if>
+                <if test="vo.options != null and vo.options != ''">
+              and x1.options like CONCAT('%',#{vo.options},'%')
+                </if>
+                <if test="vo.name != null and vo.name != ''">
+              and x1.name like CONCAT('%',#{vo.name},'%')
+                </if>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+              and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+             and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+             and x1.is_deleted = 0 order by x1.options
+    </sql>
+    <select id="selectPage" resultMap="tbQuestionOptionMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+    <select id="queryList" resultMap="tbQuestionOptionMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+</mapper>

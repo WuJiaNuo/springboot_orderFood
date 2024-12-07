@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.mapper.MyQuestionLogMapper">
+    <resultMap id="tbMyQuestionLogMap" type="edu.gdbtu.lzq.model.MyQuestionLog" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.exam_id
+            ,x1.question_id
+            ,case when xq.type='4004' then x1.my_answer else x1.my_options end my_options
+            ,case when xq.type='4004' then xq.answer else x1.right_options end right_options
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+            ,x1.id
+            ,case when xq.type='4004' then '--' else xop.all_option end all_option
+            ,sysDicItem.name as typeName
+             ,case when x1.is_right=1 then '是' else '否' end isRightText,
+             xq.content,xq.score
+
+    </sql>
+    <sql id="middles">
+        from my_question_log x1 inner join exam xm on x1.exam_id=xm.id
+            inner join question xq on x1.question_id=xq.id
+            left join (select question_id, group_concat(CONCAT(options,'.',name) order by options asc) as all_option
+            from question_option group by question_id) xop on x1.question_id=xop.question_id
+            left join (select * from sys_dic_item where is_deleted=0) sysDicItem  on xq.type=sysDicItem.code
+    </sql>
+    <sql id="conditions">
+        <if test="vo.resultId != null and vo.resultId != ''">
+            and x1.result_id=#{vo.resultId}
+        </if>
+        <if test="vo.examId != null and vo.examId != ''">
+            and x1.exam_id=#{vo.examId}
+        </if>
+        <if test="vo.questionId != null and vo.questionId != ''">
+            and x1.question_id=#{vo.questionId}
+        </if>
+        <if test="vo.myOptions != null and vo.myOptions != ''">
+            and x1.my_options like CONCAT('%',#{vo.myOptions},'%')
+        </if>
+        <if test="vo.rightOptions != null and vo.rightOptions != ''">
+            and x1.right_options like CONCAT('%',#{vo.rightOptions},'%')
+        </if>
+        <if test="vo.myAnswer != null and vo.myAnswer != ''">
+            and x1.my_answer like CONCAT('%',#{vo.myAnswer},'%')
+        </if>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+            and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+            and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+        <if test="vo.content != null and vo.content != ''">
+            and xq.content like CONCAT('%',#{vo.content},'%')
+        </if>
+        <if test="vo.type != null and vo.type != ''">
+            and xq.type = #{vo.type}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+        and x1.is_deleted = 0 order by x1.create_time desc
+    </sql>
+    <select id="selectPage" resultMap="tbMyQuestionLogMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+    <select id="queryList" resultMap="tbMyQuestionLogMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+</mapper>

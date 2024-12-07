@@ -1,0 +1,135 @@
+{
+  "id": "4252835",
+  "name": "no name",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3239256",
+      "name": "我的成绩",
+      "font_class": "wodechengji",
+      "unicode": "e688",
+      "unicode_decimal": 59016
+    },
+    {
+      "icon_id": "4354248",
+      "name": "图表-折线图",
+      "font_class": "tubiao-zhexiantu",
+      "unicode": "eb96",
+      "unicode_decimal": 60310
+    },
+    {
+      "icon_id": "7335636",
+      "name": "质量",
+      "font_class": "zhiliang",
+      "unicode": "eb46",
+      "unicode_decimal": 60230
+    },
+    {
+      "icon_id": "28276604",
+      "name": "考试管理",
+      "font_class": "kaoshiguanli",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "4306964",
+      "name": "题库管理",
+      "font_class": "tikuguanli",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "7964507",
+      "name": "试卷管理",
+      "font_class": "shijuanguanli",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "12791710",
+      "name": "考试",
+      "font_class": "kaoshi",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "6893007",
+      "name": "信息管理",
+      "font_class": "xinxiguanli",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    },
+    {
+      "icon_id": "5532906",
+      "name": "统计",
+      "font_class": "tongji",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    },
+    {
+      "icon_id": "8329620",
+      "name": "统计分析",
+      "font_class": "tongjifenxi",
+      "unicode": "e6db",
+      "unicode_decimal": 59099
+    },
+    {
+      "icon_id": "5434087",
+      "name": "字典管理",
+      "font_class": "zidianguanli",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "15668874",
+      "name": "数据字典分类",
+      "font_class": "shujuzidianfenlei",
+      "unicode": "e77e",
+      "unicode_decimal": 59262
+    },
+    {
+      "icon_id": "6241664",
+      "name": "库存管理",
+      "font_class": "kucunguanli",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
+      "icon_id": "18960259",
+      "name": "代码生成",
+      "font_class": "daimashengcheng",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "11019853",
+      "name": "入库",
+      "font_class": "ruku",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
+      "icon_id": "5483974",
+      "name": "物品",
+      "font_class": "wupin",
+      "unicode": "e757",
+      "unicode_decimal": 59223
+    },
+    {
+      "icon_id": "8206742",
+      "name": "销售",
+      "font_class": "xs",
+      "unicode": "e75b",
+      "unicode_decimal": 59227
+    },
+    {
+      "icon_id": "6246285",
+      "name": "分组",
+      "font_class": "fenzu",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    }
+  ]
+}

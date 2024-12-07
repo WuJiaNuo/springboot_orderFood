@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.system.mapper.SysDicItemMapper">
+    <resultMap id="sysDicItemMap" type="edu.gdbtu.lzq.system.model.SysDicItem" autoMapping="true">
+
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.id
+            ,x1.dic_code
+            ,x2.name as sort_name
+            ,x1.code
+            ,x1.name
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+    </sql>
+    <select id="selectPage" resultMap="sysDicItemMap">
+        select <include refid="columns" />
+        from sys_dic_item x1 inner join sys_dic x2 on x1.dic_code=x2.code
+        <where>
+                    <if test="vo.dicCode != null and vo.dicCode != ''">
+                     and x1.dic_code like CONCAT('%',#{vo.dicCode},'%')
+                    </if>
+                    <if test="vo.dicCodes != null">
+                    <choose>
+                        <when test="vo.dicCodes != ''">
+                            and FIND_IN_SET(x1.code,#{vo.dicCodes})
+                        </when>
+                        <otherwise>
+                            and 1=2
+                        </otherwise>
+                    </choose>
+                    </if>
+                    <if test="vo.code != null and vo.code != ''">
+                     and x1.code like CONCAT('%',#{vo.code},'%')
+                    </if>
+                    <if test="vo.name != null and vo.name != ''">
+                     and x1.name like CONCAT('%',#{vo.name},'%')
+                    </if>
+                    <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                        and x1.create_time >= #{vo.createTimeBegin}
+                    </if>
+                    <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                        and x1.create_time &lt;= #{vo.createTimeEnd}
+                    </if>
+                    <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+                        and x1.create_time >= #{vo.updateTimeBegin}
+                    </if>
+                    <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+                        and x1.create_time &lt;= #{vo.updateTimeEnd}
+                    </if>
+                    and x1.is_deleted = 0 order by x1.create_time desc
+        </where>
+    </select>
+
+    <select id="queryList" resultMap="sysDicItemMap">
+        select <include refid="columns" />
+        from sys_dic_item x1 inner join sys_dic x2 on x1.dic_code=x2.code
+        <where>
+            <if test="vo.dicCode != null and vo.dicCode != ''">
+                and x1.dic_code like CONCAT('%',#{vo.dicCode},'%')
+            </if>
+            <if test="vo.code != null and vo.code != ''">
+                and x1.code like CONCAT('%',#{vo.code},'%')
+            </if>
+            <if test="vo.name != null and vo.name != ''">
+                and x1.name like CONCAT('%',#{vo.name},'%')
+            </if>
+            <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                and x1.create_time >= #{vo.createTimeBegin}
+            </if>
+            <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                and x1.create_time &lt;= #{vo.createTimeEnd}
+            </if>
+            <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+                and x1.create_time >= #{vo.updateTimeBegin}
+            </if>
+            <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+                and x1.create_time &lt;= #{vo.updateTimeEnd}
+            </if>
+            and x1.is_deleted = 0 order by x1.code asc
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.mapper.UserExamRelationMapper">
+    <resultMap id="tbUserExamRelationMap" type="edu.gdbtu.lzq.model.UserExamRelation" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.exam_id
+            ,x1.user_id
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+            ,x1.status
+            ,x1.id
+
+    </sql>
+    <sql id="middles">
+        from user_exam_relation x1
+    </sql>
+    <sql id="conditions">
+                <if test="vo.examId != null and vo.examId != ''">
+              and x1.exam_id=#{vo.examId}
+                </if>
+                <if test="vo.userId != null and vo.userId != ''">
+              and x1.user_id=#{vo.userId}
+                </if>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+              and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+             and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+             and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+             and x1.is_deleted = 0 order by x1.create_time desc
+    </sql>
+    <select id="selectPage" resultMap="tbUserExamRelationMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+    <select id="queryList" resultMap="tbUserExamRelationMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+</mapper>

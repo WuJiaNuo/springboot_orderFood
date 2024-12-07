@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.gdbtu.lzq.mapper.QuestionMapper">
+    <resultMap id="tbQuestionMap" type="edu.gdbtu.lzq.model.Question" autoMapping="true">
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+            x1.content
+            ,x1.score
+            ,x1.answer
+            ,x1.remark
+            ,x1.type,sysDicItem.name as typeName
+            ,x1.dept_id,sysDept.name as deptName
+            ,x1.create_time
+            ,x1.update_time
+            ,x1.is_deleted
+            ,x1.id
+
+    </sql>
+    <sql id="middles">
+        from question x1
+                left join (select * from sys_dic_item where is_deleted=0) sysDicItem  on x1.type=sysDicItem.code
+                left join (select * from sys_dept where is_deleted=0) sysDept  on x1.dept_id=sysDept.id
+    </sql>
+    <sql id="conditions">
+        <if test="vo.deptName != null and vo.deptName != ''">
+            and sysDept.name like CONCAT('%',#{vo.deptName},'%')
+        </if>
+        <if test="vo.content != null and vo.content != ''">
+            and x1.content like CONCAT('%',#{vo.content},'%')
+        </if>
+        <if test="vo.remark != null and vo.remark != ''">
+            and x1.remark like CONCAT('%',#{vo.remark},'%')
+        </if>
+        <if test="vo.type != null and vo.type != ''">
+            and x1.type like CONCAT('%',#{vo.type},'%')
+        </if>
+        <if test="vo.typeName != null and vo.typeName != ''">
+            and sysDicItem.name like CONCAT('%',#{vo.typeName},'%')
+        </if>
+        <if test="vo.examId != null and vo.examId != '' and vo.isRand !=1">
+            and exists (select 1 from exam_question_relation tbExamQuestionRelation where
+            tbExamQuestionRelation.is_deleted=0
+            and tbExamQuestionRelation.question_id=x1.id and tbExamQuestionRelation.exam_id=#{vo.examId})
+        </if>
+        <choose>
+            <when test="vo.deptId != null and vo.deptId != ''">
+                and exists (select 1 from sys_dept xd
+                where x1.dept_id=xd.id
+                and xd.is_deleted=0 and xd.tree_path
+                like CONCAT('%,',#{vo.deptId},',%'))
+            </when>
+            <when test="vo.curDeptIds!= null">
+                and exists (select 1 from sys_dept xd
+                where x1.dept_id=xd.id
+                and xd.is_deleted=0 and
+                <foreach item="item" index="index" collection="vo.curDeptIds" open="(" separator=" or" close="))">
+                    xd.tree_path like CONCAT('%,',#{item},',%')
+                </foreach>
+            </when>
+        </choose>
+        <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+            and x1.create_time >= #{vo.createTimeBegin}
+        </if>
+        <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.createTimeEnd}
+        </if>
+        <if test="vo.updateTimeBegin != null and vo.updateTimeBegin != ''">
+            and x1.create_time >= #{vo.updateTimeBegin}
+        </if>
+        <if test="vo.updateTimeEnd != null and vo.updateTimeEnd != ''">
+            and x1.create_time &lt;= #{vo.updateTimeEnd}
+        </if>
+        and x1.is_deleted = 0
+         <choose>
+            <when test="vo.resultId != null and vo.resultId != ''">
+                and exists (select 1 from my_question_log tl where tl.result_id=#{vo.resultId}
+                and tl.question_id=x1.id and tl.is_right=0)
+            </when>
+             <when test="vo.isRand==1">
+                order by RAND() limit #{vo.getNum}
+             </when>
+             <otherwise>
+                 order by x1.create_time desc
+             </otherwise>
+         </choose>
+
+    </sql>
+    <select id="selectPage" resultMap="tbQuestionMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+    <select id="queryList" resultMap="tbQuestionMap">
+        select <include refid="columns" />
+        <include refid="middles" />
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+        <select id="getById" resultMap="tbQuestionMap">
+       select x.*,d.name as dept_name
+       from question x left join (select id,name from sys_dept where is_deleted = 0)  d on x.dept_id = d.id
+       where x.id = #{id}
+        </select>
+</mapper>
